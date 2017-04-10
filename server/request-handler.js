@@ -12,6 +12,8 @@ this file and include it in basic-server.js so that it actually works.
 
 **************************************************************/
 
+var fs = require('fs');
+
 var requestHandler = function(request, response) {
   // Request and Response come from node's http module.
   //
@@ -35,6 +37,16 @@ var requestHandler = function(request, response) {
   // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
 
+  var test;
+  fs.readFile('./data.txt', 'utf-8', function(err, data) {
+    if (err) {
+      throw err;
+    }
+    test = JSON.stringify(data);
+    response.end(test);
+  })
+  console.log()
+
   // Tell the client we are sending them plain text.
   //
   // You will need to change this if you are sending something
@@ -52,7 +64,7 @@ var requestHandler = function(request, response) {
   //
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
-  response.end('Hello, World!');
+  // response.end('Hello world!');
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
@@ -71,3 +83,4 @@ var defaultCorsHeaders = {
   'access-control-max-age': 10 // Seconds.
 };
 
+module.exports.requestHandler = requestHandler;
