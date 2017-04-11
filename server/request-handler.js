@@ -12,8 +12,15 @@ this file and include it in basic-server.js so that it actually works.
 
 **************************************************************/
 
-var fs = require('fs');
+// var dataObject = {
+//   results: [
+//     {'username': 'alex','text': 'bob is your uncle','rooomname': 'lobby','objectID': '1'},
+//     {'username': 'rishi','text': 'hello world','rooomname': 'lobby','objectID': '2'}
+//   ]
+// }
 
+var fs = require('fs');
+var objectID = 7;
 var requestHandler = function(request, response) {
   // Request and Response come from node's http module.
   //
@@ -37,25 +44,17 @@ var requestHandler = function(request, response) {
   // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
 
-  var test;
-  fs.readFile('./data.txt', 'utf-8', function(err, data) {
-    if (err) {
-      throw err;
-    }
-    test = JSON.stringify(data);
-    response.end(test);
-  })
-  console.log()
+
 
   // Tell the client we are sending them plain text.
   //
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
-  headers['Content-Type'] = 'text/plain';
+  headers['Content-Type'] = 'application/json';
 
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
-  response.writeHead(statusCode, headers);
+  //response.writeHead(statusCode, headers);
 
   // Make sure to always call response.end() - Node may not send
   // anything back to the client until you do. The string you pass to
@@ -65,6 +64,49 @@ var requestHandler = function(request, response) {
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
   // response.end('Hello world!');
+
+  if(request.method === 'GET' && request.url === '/classes/messages') {
+    fs.readFile('./data.txt', 'utf-8', function(err, data) {
+      if (err) {
+        response.writeHead(404, headers);
+      } else {
+
+        response.writeHead(200, headers);
+        var dataObject = JSON.parse('['+data+']');
+        response.end(JSON.stringify({results: dataObject}));
+      }
+    });
+    // response.writeHead(200, headers);
+    // response.end(JSON.stringify(dataObject));
+  } else if (request.method === 'POST') {
+    var body = [];
+    request.on('data', function(message){
+      body.push(message);
+    }).on('end', function() {
+      body = Buffer.concat(body).toString();
+      var jsonBody = JSON.parse(body);
+      if(!jsonBody['roomname']) {
+        jsonBody['roomname'] = 'lobby';
+      }
+      jsonBody.objectID = objectID;
+      objectID++;
+      fs.appendFile('./data.txt', ','+JSON.stringify(jsonBody), 'utf-8', function(err) {
+        if(err) {
+          response.writeHead(404);
+          response.end('{"success": "YAY - message posted", "status": 201}')
+        } else {
+          console.log('trying to write 201');
+          response.writeHead(201, headers);
+          response.end('{"success": "YAY - message posted", "status": 201}')
+        }
+      });
+    });
+
+    // request.on('end', function() {
+    //   response.end('{"success": "YAY - message posted", "status": 201}');
+    // });
+
+  }
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
