@@ -20,7 +20,9 @@ this file and include it in basic-server.js so that it actually works.
 // }
 
 var fs = require('fs');
+var url = require('url');
 var objectID = 7;
+
 var requestHandler = function(request, response) {
   // Request and Response come from node's http module.
   //
@@ -46,6 +48,7 @@ var requestHandler = function(request, response) {
 
 
 
+
   // Tell the client we are sending them plain text.
   //
   // You will need to change this if you are sending something
@@ -66,11 +69,24 @@ var requestHandler = function(request, response) {
   // response.end('Hello world!');
 
   if(request.method === 'GET' && request.url === '/classes/messages') {
+    //console.log(request.url);
+    // var queryObject = url.parse(request.url, true).query;
+    // console.log(queryObject);
+    // for(var key in queryObject) {
+    //   if(key === 'order') {
+    //     orderMessages(queryObject[key]);
+    //   }
+    //
+    //   if(key === 'limit') {
+    //     limitMessages(queryObject[key]);
+    //   }
+    // }
     fs.readFile('./data.txt', 'utf-8', function(err, data) {
       if (err) {
         response.writeHead(404, headers);
       } else {
 
+        data = data.slice(1);
         response.writeHead(200, headers);
         var dataObject = JSON.parse('['+data+']');
         response.end(JSON.stringify({results: dataObject}));
@@ -85,11 +101,12 @@ var requestHandler = function(request, response) {
     }).on('end', function() {
       body = Buffer.concat(body).toString();
       var jsonBody = JSON.parse(body);
-      if(!jsonBody['roomname']) {
+      if(!jsonBody['roomname']||jsonBody['roomname'] === '- Add new room -' ) {
         jsonBody['roomname'] = 'lobby';
       }
       jsonBody.objectID = objectID;
       objectID++;
+      jsonBody.createdAt = new Date().getTime();
       fs.appendFile('./data.txt', ','+JSON.stringify(jsonBody), 'utf-8', function(err) {
         if(err) {
           response.writeHead(404);
@@ -106,6 +123,11 @@ var requestHandler = function(request, response) {
     //   response.end('{"success": "YAY - message posted", "status": 201}');
     // });
 
+  } else if(request.method === 'GET' && request.url === '/classes/rooms') {
+
+  } else {
+    response.writeHead(404, headers);
+    response.end('Invalid URL on server');
   }
 };
 
