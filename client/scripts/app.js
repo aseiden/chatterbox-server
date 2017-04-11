@@ -9,12 +9,15 @@ class Chatterbox {
 
   init () {
     var thisObj = this;
+    console.log(thisObj);
+    console.log(this);
     this.fetch(function(data) {
       console.log(data)
+      console.log('hello')
       // Initialize app to lobby messages
       thisObj.renderRooms(data, 'lobby');
       thisObj.renderMessages(data, 'lobby');
-    });
+
 
       // Select a different room
     $('#roomSelect').change(function() {
@@ -28,12 +31,12 @@ class Chatterbox {
 
       // Send chat message
     $('body').on('click', '.chat-submit', function() {
-      debugger;
       var message = {
         username: window.localStorage.username,
         message: $('.chat-input').val(),
         roomname: $('#roomSelect').val()
       }
+      console.log(message);
       thisObj.send(message);
       $('.chat-input').val('');
     })
@@ -69,15 +72,16 @@ class Chatterbox {
 
       // Prevent form submits from refreshing page
     $('body').on('click', 'form', function(event) {
-      debugger;
       event.preventDefault();
+    });
+
     });
     // , thisObj.SEARCH_PARAMS);
   }
 
   send (message) {
     var thisObj = this;
-    $.post(this.server, message);
+    $.post(this.server, JSON.stringify(message));
     // $.ajax({
     //   // This is the url you should use to communicate with the parse API server.
     //   url: this.server,
@@ -99,7 +103,7 @@ class Chatterbox {
     var thisObj = this;
     $.get(this.server, successCallback);
     // $.ajax({
-    //   url: this.server + urlCode,
+    //   url: this.server,
     //   type: 'GET',
     //   contentType: 'application/json',
     //   success: function(data) {
