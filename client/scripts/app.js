@@ -81,40 +81,14 @@ class Chatterbox {
 
   send (message) {
     var thisObj = this;
-    $.post(this.server, JSON.stringify(message));
-    // $.ajax({
-    //   // This is the url you should use to communicate with the parse API server.
-    //   url: this.server,
-    //   type: 'POST',
-    //   data: JSON.stringify(message),
-    //   contentType: 'application/json',
-    //   success: function (data) {
-    //
-    //     thisObj.getNewMessages(message.roomname);
-    //   },
-    //   error: function (data) {
-    //     // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
-    //     console.error('chatterbox: Failed to send message', data);
-    //   }
-    // });
+    $.post(this.server, JSON.stringify(message), function(data) {
+      thisObj.getNewMessages(message.roomname);
+    });
   }
 
   fetch (successCallback, urlCode = '') {
     var thisObj = this;
     $.get(this.server, successCallback);
-    // $.ajax({
-    //   url: this.server,
-    //   type: 'GET',
-    //   contentType: 'application/json',
-    //   success: function(data) {
-    //     successCallback(data);
-    //     thisObj.lastFetchedAt = data.results[0].createdAt;
-    //     console.log("latest chat at", thisObj.lastFetchedAt);
-    //   },
-    //   error: function () {
-    //     console.log('it broke');
-    //   }
-    // });
   }
 
   getNewMessages (room) {
@@ -132,12 +106,11 @@ class Chatterbox {
     var thisObj = this;
 
     var filteredMessages = response.results.filter(function(message) {
-      return true;
-      // if (message.roomname === room) {
-      //   return true;
-      // } else {
-      //   return false;
-      // }
+      if (message.roomname === room) {
+        return true;
+      } else {
+        return false;
+      }
     });
 
     filteredMessages.forEach(function(message) {
