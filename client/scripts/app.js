@@ -2,7 +2,7 @@ class Chatterbox {
   constructor(value) {
     this.name = value;
     this.server = 'http://127.0.0.1:3000/classes/messages';
-    // this.SEARCH_PARAMS = '?order=-createdAt&limit=1000';
+    //this.SEARCH_PARAMS = '?order=-createdAt&limit=1000';
     this.friends = [];
     this.lastFetchedAt;
   }
@@ -88,7 +88,7 @@ class Chatterbox {
 
   fetch (successCallback, urlCode = '') {
     var thisObj = this;
-    $.get(this.server, successCallback);
+    $.get(this.server /*+ this.SEARCH_PARAMS*/, successCallback);
   }
 
   getNewMessages (room) {
