@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>chatterbox</title>
+    <link rel="stylesheet" href="styles/styles.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <!-- dependencies -->
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/underscore/underscore.js"></script>
+    <script>
+      // YOU DO NOT NEED TO EDIT THIS CODE
+      if (!/(&|\?)username=/.test(window.location.search)) {
+        var newSearch = window.location.search;
+        if (newSearch !== '' & newSearch !== '?') {
+          newSearch += '&';
+        }
+        window.localStorage.username = prompt('What is your name?');
+        newSearch += 'username=' + (window.localStorage.username || 'anonymous');
+        window.location.search = newSearch;
+      }
+    </script>
+    <!-- your scripts -->
+    <!-- <script src="env/config.js"></script> -->
+    <script src="scripts/app.js"></script>
+  </head>
+  <body>
+    <div id="main">
+      <h1>chatterbox</h1>
+      <select id="roomSelect"></select>
+      <!-- Your HTML goes here! -->
+      <div class="room-form">
+        <input class="room-input" type="text" name="room" value="" placeholder="New room name">
+        <button class="room-submit" type="submit" name="create-room" value="">Create room</button>
+      </div>
+    </div>
+    <div class="menu">
+      <form>
+        <input class="chat-input" type="text" name="message" placeholder="Enter message" value="">
+        <button class="chat-submit" type="submit" name="send" value="">Send message</button>
+      </form>
+    </div>
+    <div id="chats">
+    </div>
+  </body>
+</html>
