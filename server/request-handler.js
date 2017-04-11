@@ -1,6 +1,8 @@
 var fs = require('fs');
 var url = require('url');
 var _ = require('underscore');
+var serveStatic = require('serve-static');
+var finalhandler = require('finalhandler');
 var objectID = 7;
 
 var limitMessages = function (limit, data) {
@@ -77,7 +79,7 @@ var requestHandler = function(request, response) {
       jsonBody.createdAt = new Date().getTime();
       fs.appendFile('./data.txt', ','+JSON.stringify(jsonBody), 'utf-8', function(err) {
         if(err) {
-          response.writeHead(404);
+          response.writeHead(404, headers);
           response.end('{"success": "YAY - message posted", "status": 201}')
         } else {
           console.log('trying to write 201');
@@ -87,8 +89,20 @@ var requestHandler = function(request, response) {
       });
     });
 
-  } else if(request.method === 'GET' && request.url === '/classes/rooms') {
-
+  } else if(request.method === 'GET' ) {
+    var serve = serveStatic('./client');
+    serve(request, response, finalhandler(request, response));
+    // fs.readFile('./client/index.html', function(err, data) {
+    //   if (err) {
+    //     response.writeHead(500, headers);
+    //     res.end('FILE NOT FOUND, PLEASE TRY HARDER');
+    //   } else {
+    //     var testHeaders = headers;
+    //     testHeaders['Content-type'] = 'text/html'
+    //     response.writeHead(200, testHeaders);
+    //     response.end(data);
+    //   }
+    // })
   } else {
     response.writeHead(404, headers);
     response.end('Invalid URL on server');
